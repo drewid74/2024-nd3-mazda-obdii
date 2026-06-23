@@ -1,18 +1,35 @@
 mode,header,pid,signal,formula,units,status,notes
-01,7DF,01 0E,Spark advance,(A/2)-64,degBTDC,untested,
 01,7DF,01 06,STFT bank 1,(A-128)*100/128,%,untested,
 01,7DF,01 07,LTFT bank 1,(A-128)*100/128,%,untested,
-01,7DF,01 0B,MAP,A,kPa,untested,
-01,7DF,01 33,Barometric pressure,A,kPa,untested,
-01,7DF,01 1F,Run time since start,((A*256)+B),s,untested,
-01,7DF,01 44,Lambda commanded equiv ratio,((A*256)+B)*2/65536,,untested,
-01,7DF,01 3C,Catalyst temp B1S1,((A*256)+B)/10-40,degC,untested,
+01,7DF,01 0B,MAP,A,kPa,confirmed,2026-06-23 drive: 19-94 kPa range
+01,7DF,01 0E,Spark advance,(A/2)-64,degBTDC,confirmed,2026-06-23 drive: 7.5-34.5 deg
 01,7DF,01 14,O2 sensor B1S1 voltage,A*0.005,V,untested,
-01,7DF,01 45,Relative throttle position,A*100/255,%,untested,
-01,7DF,01 49,Accel pedal position D,A*100/255,%,untested,cross-check vs 22 03 2B
-01,7DF,01 4A,Accel pedal position E,A*100/255,%,untested,second pedal sensor
-01,7DF,01 4C,Commanded throttle actuator,A*100/255,%,untested,ETC commanded vs actual delta
+01,7DF,01 1F,Run time since start,((A*256)+B),s,untested,
+01,7DF,01 23,Fuel rail gauge pressure,((A*256)+B)*10,kPa,confirmed,2026-06-23 drive: 9540-25110 kPa
+01,7DF,01 33,Barometric pressure,A,kPa,confirmed,2026-06-23: 101 kPa (sea level constant)
+01,7DF,01 3C,Catalyst temp B1S1,((A*256)+B)/10-40,degC,confirmed,2026-06-23 drive: 365-591 deg C
+01,7DF,01 43,Absolute load,((A*256)+B)*100/255,%,confirmed,2026-06-23 drive: 11-55%
+01,7DF,01 44,Lambda commanded equiv ratio,((A*256)+B)*2/65536,,confirmed,2026-06-23 drive: 0.91-2.00 (open loop saturated)
+01,7DF,01 45,Relative throttle position,A*100/255,%,confirmed,2026-06-23 drive: 1.96-30%
+01,7DF,01 47,Absolute throttle position B,A*100/255,%,confirmed,2026-06-23 drive: 12-39.6%
+01,7DF,01 49,Accel pedal position D,A*100/255,%,confirmed,2026-06-23 drive: 16-47%; cross-check vs 22 03 2B
+01,7DF,01 4A,Accel pedal position E,A*100/255,%,confirmed,2026-06-23 drive: 7.8-22.7%
+01,7DF,01 4C,Commanded throttle actuator,A*100/255,%,confirmed,2026-06-23 drive: 0-17% (ETC commanded)
+01,7DF,01 59,Fuel rail pressure absolute,((A*256)+B)*10,kPa,confirmed,2026-06-23 drive: 10080-25590 kPa
 01,7DF,01 5C,Oil temp alternate,A-40,degC,untested,cross-check vs 22 13 10
+01,7DF,01 5E,Engine fuel rate,((A*256)+B)*0.05,L/h,confirmed,2026-06-23 drive: 0.9-10.5 L/h
+01,7DF,01 62,Actual engine torque,A-125,%,confirmed,2026-06-23 drive: 10-78%
+01,7DF,01 63,Engine reference torque,(A*256)+B,Nm,confirmed,2026-06-23: 250 Nm (vehicle constant per SAE)
+01,7DF,01 65,Manual trans neutral / gear status,byte B raw (NOT byte A),,partial,2026-06-23: byte A is support bitmap always 0x10; byte B varies 0x30/0x00/0x60/0x40 during drive but bit-to-gear mapping TBD
+01,7DF,01 67,Engine coolant temp 1 & 2,B-40 (byte B),degC,confirmed,2026-06-23 drive: mirrors 01 05
+01,7DF,01 68,Intake air temp multi-sensor,multi-byte,degC,partial,2026-06-23: responded OK but byte layout for each sub-sensor TBD
+01,7DF,01 6D,Fuel rail pressure/temp multi,multi-byte,,partial,2026-06-23: responded OK but byte layout TBD
+01,7DF,01 8E,Engine friction torque,A-125,%,confirmed,2026-06-23 drive: 7-10%
+01,7DF,01 9D,Engine/Vehicle fuel rate,((A*256)+B)/50,g/s,confirmed,2026-06-23 drive: 0.45-6.05 g/s
+01,7DF,01 9E,Engine exhaust flow rate,((A*256)+B)/20,kg/h,confirmed,2026-06-23 drive: 11-120 kg/h
+01,7DF,01 A4,Transmission gear ratio,((C*256)+D)/1000,,confirmed,2026-06-23 drive: 1.594/2.035/2.991/3.127 (engine ON required)
+01,7DF,01 A4,Transmission actual gear (nibble),byte B high nibble,,partial,2026-06-23: byte B varied 0x00/0x20/0x30/0x40 during drive but nibble-to-gear mapping needs parking-lot creep
+01,7DF,01 A6,Vehicle odometer,((A*256^3)+(B*256^2)+(C*256)+D)/10,km,confirmed,2026-06-23: drift matched actual drive distance (8698.8 -> 8700.8 = 2.0 km)
 22,7E0,22 09 3C,Intake shutter valve angle,((A*256)+B)/512,deg,untested,ND2 address - may have moved
 22,7E0,22 F4 11,Intake shutter valve %,(A*100)/255,%,untested,ND2 address - may have moved
 22,7E0,22 05 22,Fuel temperature,A-40,degC,untested,ND2 address - may have moved
@@ -21,4 +38,12 @@ mode,header,pid,signal,formula,units,status,notes
 22,7E0,22 04 51,O2 concentration,(A*100)/255,%,untested,ND2 address - may have moved
 22,7E0,22 05 19,Oil last change distance,((A*256)+B)*4,km,untested,ND2 address - may have moved
 22,7E0,22 05 42,Oil change interval max,(A*256)+B,km,untested,ND2 address - may have moved
-22,7E1,22 1E 12,Gear position,LOOKUP(A:16=1;32=2;48=3;64=4;80=5;96=6;50=N;60=R;70=P),,untested,TCM - try 7E2 if 7E1 NACKs
+22,7E1,22 1E 12,Gear position,LOOKUP(A:16=1;32=2;48=3;64=4;80=5;96=6;50=N;60=R;70=P),,deprecated,Use 01 A4 instead (works on standard 7DF; this candidate is ND2-era TCM address that doesn't apply to ND3)
+22,760,22 20 33,DSC steering angle candidate,signed_int16(A,B)/10,deg,partial,2026-06-23 range scan: 4 hits in 760/22 20 cluster. 22 20 33 is the primary angle candidate (00 00 centered when parked); needs engine-on wheel-turn test to confirm scale + sign
+22,760,22 20 34,DSC steering rate candidate,signed_int16(A,B)/10,deg/s,partial,2026-06-23: static 00 00 engine-off; SLOW vs FAST turn test needed to distinguish rate from alt angle encoding
+22,760,22 20 1D,DSC status flag,A,,confirmed,2026-06-23: static 0x04 always - likely DSC armed indicator not dynamic measurement
+22,760,22 20 1F,DSC status flag,A,,confirmed,2026-06-23: static 0x00 always - likely no-fault indicator
+22,730,22 20 XX,EPS module range,n/a,n/a,dead,2026-06-23: full 256-PID range scan returned 0 hits. EPS does NOT respond to 0x730 header on ND3. Try 0x7E2 0x720 or physical addressing
+22,730,22 06 XX,EPS alt range,n/a,n/a,dead,2026-06-23: 0 hits in 256-PID scan
+22,760,22 21 XX,Yaw / lateral G range,n/a,n/a,dead,2026-06-23: 0 hits. Not on DSC at this range. Use IMU instead
+22,760,22 06 XX,Wheel speeds range,n/a,n/a,dead,2026-06-23: 0 hits. DSC has wheel speeds internally but does not expose at this sub-address
