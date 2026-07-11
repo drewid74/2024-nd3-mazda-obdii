@@ -1,49 +1,71 @@
 mode,header,pid,signal,formula,units,status,notes
-01,7DF,01 06,STFT bank 1,(A-128)*100/128,%,untested,
-01,7DF,01 07,LTFT bank 1,(A-128)*100/128,%,untested,
+01,7DF,01 03,Fuel system 1/2 status,bitmap,,confirmed,2026-07-10 diag report: B1 = closed-loop using O2 feedback. B2 = Unknown (single-bank engine; expected)
+01,7DF,01 06,STFT bank 1,(A-128)*100/128,%,confirmed,2026-07-10 diag report: 3.91% at warm idle
+01,7DF,01 07,LTFT bank 1,(A-128)*100/128,%,confirmed,2026-07-10 diag report: 0.78% at warm idle
 01,7DF,01 0B,MAP,A,kPa,confirmed,2026-06-23 drive: 19-94 kPa range
 01,7DF,01 0E,Spark advance,(A/2)-64,degBTDC,confirmed,2026-06-23 drive: 7.5-34.5 deg
-01,7DF,01 14,O2 sensor B1S1 voltage,A*0.005,V,untested,
-01,7DF,01 1F,Run time since start,((A*256)+B),s,untested,
+01,7DF,01 13,O2 sensor locations,bitmap,,confirmed,2026-07-10 diag report: Bank 1 Sensor 1 + Sensor 2 only. No bank 2. Use to auto-configure O2 channels
+01,7DF,01 14,O2 sensor B1S1 voltage,A*0.005,V,not-supported,2026-07-10 diag report: absent from support bitmaps. B1S1 is a WIDEBAND sensor - it reports via 01 34 (lambda + current) not the narrowband voltage PID. Do not probe.
+01,7DF,01 15,O2 sensor B1S2 voltage + STFT,V = A/200; STFT = (B-128)*100/128,V / %,confirmed,2026-07-10 diag report: 0.73 V / 0%. This is the post-cat narrowband
+01,7DF,01 1F,Run time since start,((A*256)+B),s,confirmed,2026-07-10 diag report: 1402 s
 01,7DF,01 23,Fuel rail gauge pressure,((A*256)+B)*10,kPa,confirmed,2026-06-23 drive: 9540-25110 kPa
+01,7DF,01 2E,Commanded evaporative purge,A*100/255,%,confirmed,2026-07-10 diag report: 32.94%
+01,7DF,01 32,Evap system vapor pressure,signed_int16(A;B)/4,Pa,confirmed,2026-07-10 diag report: -1108 Pa (-4.45 inH2O). Scaling inferred - verify
 01,7DF,01 33,Barometric pressure,A,kPa,confirmed,2026-06-23: 101 kPa (sea level constant)
-01,7DF,01 3C,Catalyst temp B1S1,((A*256)+B)/10-40,degC,confirmed,2026-06-23 drive: 365-591 deg C
+01,7DF,01 34,O2 lambda wide-range B1S1 (ACTUAL),lambda = ((A*256)+B)*2/65536; current_mA = ((C*256)+D)/256-128,/ mA,confirmed,2026-07-10 diag report: lambda 0.995 / -0.004 mA. IMPORTANT: this is MEASURED lambda. 01 44 is COMMANDED lambda. Poll both; the delta is closed-loop fuelling error
+01,7DF,01 3C,Catalyst temp B1S1,((A*256)+B)/10-40,degC,confirmed,2026-06-23 drive: 365-591 degC. 2026-07-10: 537 degC warm idle / 622 degC part-throttle cruise
 01,7DF,01 43,Absolute load,((A*256)+B)*100/255,%,confirmed,2026-06-23 drive: 11-55%
-01,7DF,01 44,Lambda commanded equiv ratio,((A*256)+B)*2/65536,,confirmed,2026-06-23 drive: 0.91-2.00 (open loop saturated)
+01,7DF,01 44,Lambda COMMANDED equiv ratio,((A*256)+B)*2/65536,,confirmed,2026-06-23 drive: 0.91-2.00 (open loop saturated). Pair with 01 34 (actual)
 01,7DF,01 45,Relative throttle position,A*100/255,%,confirmed,2026-06-23 drive: 1.96-30%
 01,7DF,01 47,Absolute throttle position B,A*100/255,%,confirmed,2026-06-23 drive: 12-39.6%
-01,7DF,01 49,Accel pedal position D,A*100/255,%,confirmed,2026-06-23 drive: 16-47%; cross-check vs 22 03 2B
-01,7DF,01 4A,Accel pedal position E,A*100/255,%,confirmed,2026-06-23 drive: 7.8-22.7%
+01,7DF,01 49,Accel pedal position D,A*100/255,%,confirmed,2026-06-23 drive: 16-47%. PREFERRED over 22 03 2B (which is redundant)
+01,7DF,01 4A,Accel pedal position E,A*100/255,%,confirmed,2026-06-23 drive: 7.8-22.7%. Second DBW pedal sensor; cross-check against 01 49
 01,7DF,01 4C,Commanded throttle actuator,A*100/255,%,confirmed,2026-06-23 drive: 0-17% (ETC commanded)
+01,7DF,01 51,Fuel type,enum,,confirmed,2026-07-10 diag report: Gasoline/petrol. Static
+01,7DF,01 55,Secondary O2 STFT bank 1,(A-128)*100/128,%,confirmed,2026-07-10 diag report: 0%
+01,7DF,01 56,Secondary O2 LTFT bank 1,(A-128)*100/128,%,confirmed,2026-07-10 diag report: 0%
 01,7DF,01 59,Fuel rail pressure absolute,((A*256)+B)*10,kPa,confirmed,2026-06-23 drive: 10080-25590 kPa
-01,7DF,01 5C,Oil temp alternate,A-40,degC,untested,cross-check vs 22 13 10
+01,7DF,01 5C,Oil temp alternate,A-40,degC,not-supported,2026-07-10 diag report: absent from support bitmaps. Oil temp is ONLY available via Mode 22 (7E0 / 22 13 10) on ND3. Do not probe.
 01,7DF,01 5E,Engine fuel rate,((A*256)+B)*0.05,L/h,confirmed,2026-06-23 drive: 0.9-10.5 L/h
-01,7DF,01 62,Actual engine torque,A-125,%,confirmed,2026-06-23 drive: 10-78%
-01,7DF,01 63,Engine reference torque,(A*256)+B,Nm,confirmed,2026-06-23: 250 Nm (vehicle constant per SAE)
-01,7DF,01 65,Manual trans neutral / gear status,byte B raw (NOT byte A),,partial,2026-06-23: byte A is support bitmap always 0x10; byte B varies 0x30/0x00/0x60/0x40 during drive but bit-to-gear mapping TBD
+01,7DF,01 62,Actual engine torque,A-125,%,confirmed,2026-06-23 drive: 10-78%. Multiply by 01 63 for flywheel Nm
+01,7DF,01 63,Engine reference torque,(A*256)+B,Nm,confirmed,2026-06-23: 250 Nm (vehicle constant per SAE). Confirmed again 2026-07-10 (184.39 lb-ft = 250 Nm)
+01,7DF,01 65,Recommended gear (shift indicator),byte B; byte A = aux I/O support bitmap (0x10),,confirmed,CORRECTED 2026-07-10: this is the SAE RECOMMENDED gear / shift-indicator hint - NOT current gear and NOT neutral status. Decodes to Neutral at rest. Explains the 0x30/0x00/0x60/0x40 variation seen 2026-06-23 (it was recommending different gears). For ENGAGED gear use 01 A4. Prior bit-to-gear open question is void.
 01,7DF,01 67,Engine coolant temp 1 & 2,B-40 (byte B),degC,confirmed,2026-06-23 drive: mirrors 01 05
-01,7DF,01 68,Intake air temp multi-sensor,multi-byte,degC,partial,2026-06-23: responded OK but byte layout for each sub-sensor TBD
-01,7DF,01 6D,Fuel rail pressure/temp multi,multi-byte,,partial,2026-06-23: responded OK but byte layout TBD
+01,7DF,01 68,Intake air temp sensors 1 & 2,A = support bitmap (3); IAT1 = B-40; IAT2 = C-40,degC,confirmed,RESOLVED 2026-07-10: byte layout confirmed. IAT1 36.0 degC / IAT2 46.0 degC. The DELTA between them is intake heat-soak - useful track channel
+01,7DF,01 6D,Fuel rail pressure control,A = support bitmap (7); then commanded rail pressure / actual rail pressure / rail TEMPERATURE,kPa / degC,partial,2026-07-10: rail temp 56 degC decoded. Commanded ~10000 kPa / actual ~10030 kPa. Exact byte offsets within the multi-field response still TBD
 01,7DF,01 8E,Engine friction torque,A-125,%,confirmed,2026-06-23 drive: 7-10%
 01,7DF,01 9D,Engine/Vehicle fuel rate,((A*256)+B)/50,g/s,confirmed,2026-06-23 drive: 0.45-6.05 g/s
 01,7DF,01 9E,Engine exhaust flow rate,((A*256)+B)/20,kg/h,confirmed,2026-06-23 drive: 11-120 kg/h
-01,7DF,01 A4,Transmission gear ratio,((C*256)+D)/1000,,confirmed,2026-06-23 drive: 1.594/2.035/2.991/3.127 (engine ON required)
-01,7DF,01 A4,Transmission actual gear (nibble),byte B high nibble,,partial,2026-06-23: byte B varied 0x00/0x20/0x30/0x40 during drive but nibble-to-gear mapping needs parking-lot creep
+01,7DF,01 A4,Transmission gear ratio,((C*256)+D)/1000,,confirmed,2026-06-23 drive: 1.594/2.035/2.991/3.127. GATE ON 01 0D > 0 - see note on gear status row
+01,7DF,01 A4,Transmission actual gear status,byte B (enumerated),,partial,CORRECTED 2026-07-10: byte B is an ENUMERATED gear status (decodes cleanly to Neutral) not a raw nibble. Value-to-gear mapping still needs parking-lot creep test WHILE MOVING. NOTE: ratio reads 5.09 whenever the car is STOPPED (output shaft speed = 0 makes RPM/shaft-speed undefined) - engine on OR off. Earlier claim that 5.087 was an engine-off artifact was WRONG.
 01,7DF,01 A6,Vehicle odometer,((A*256^3)+(B*256^2)+(C*256)+D)/10,km,confirmed,2026-06-23: drift matched actual drive distance (8698.8 -> 8700.8 = 2.0 km)
-22,7E0,22 09 3C,Intake shutter valve angle,((A*256)+B)/512,deg,untested,ND2 address - may have moved
+22,7E0,22 03 2B,Accel pedal % (encoding B),A/2,%,deprecated,REDUNDANT as of 2026-07-10: standard 01 49 / 01 4A provide the same signal (both DBW pedal sensors) with no Mode 22 round-trip. Drop from polling groups.
+22,7E0,22 13 10,Engine oil temperature,(((A*256)+B)/100)-40,degC,confirmed,2026-06-23 drive: 66.7-78.4 degC. NO standard-mode equivalent (01 5C is not supported) - this PID justifies Mode 22
+22,760,22 2B 0D,Brake position,max(0; signed_int16(A;B))/2.3,%,confirmed,2026-06-23: 0-0.43% light tap. NO standard-mode equivalent - this PID justifies Mode 22
+22,7E0,22 09 3C,Intake shutter valve angle,((A*256)+B)/512,deg,untested,ND2 address - may have moved. NOTE: Mode 06 monitor $35 exposes 6 VVT values with real units + bounds; may serve as a decode oracle for the 22 09 XX cluster
 22,7E0,22 F4 11,Intake shutter valve %,(A*100)/255,%,untested,ND2 address - may have moved
-22,7E0,22 05 22,Fuel temperature,A-40,degC,untested,ND2 address - may have moved
+22,7E0,22 05 22,Fuel temperature,A-40,degC,untested,ND2 address - may have moved. Cross-check against 01 6D rail temperature field
 22,7E0,22 03 07,Fuel pump load,(((A*256)+B)*100)/65535,%,untested,ND2 address - may have moved
 22,7E0,22 DA A1,Timing chain elongation angle,(((A*256)+B)-32768)/100,deg,untested,ND2 address - may have moved
-22,7E0,22 04 51,O2 concentration,(A*100)/255,%,untested,ND2 address - may have moved
+22,7E0,22 04 51,O2 concentration,(A*100)/255,%,untested,ND2 address - may have moved. Prefer standard 01 34 (confirmed) for lambda
 22,7E0,22 05 19,Oil last change distance,((A*256)+B)*4,km,untested,ND2 address - may have moved
 22,7E0,22 05 42,Oil change interval max,(A*256)+B,km,untested,ND2 address - may have moved
 22,7E1,22 1E 12,Gear position,LOOKUP(A:16=1;32=2;48=3;64=4;80=5;96=6;50=N;60=R;70=P),,deprecated,Use 01 A4 instead (works on standard 7DF; this candidate is ND2-era TCM address that doesn't apply to ND3)
-22,760,22 20 33,DSC steering angle candidate,signed_int16(A,B)/10,deg,partial,2026-06-23 range scan: 4 hits in 760/22 20 cluster. 22 20 33 is the primary angle candidate (00 00 centered when parked); needs engine-on wheel-turn test to confirm scale + sign
-22,760,22 20 34,DSC steering rate candidate,signed_int16(A,B)/10,deg/s,partial,2026-06-23: static 00 00 engine-off; SLOW vs FAST turn test needed to distinguish rate from alt angle encoding
+22,760,22 20 33,DSC steering angle candidate,signed_int16(A;B)/10,deg,partial,2026-06-23 range scan: 4 hits in 760/22 20 cluster. 22 20 33 is the primary angle candidate (00 00 centered when parked); needs engine-on wheel-turn test to confirm scale + sign
+22,760,22 20 34,DSC steering rate candidate,signed_int16(A;B)/10,deg/s,partial,2026-06-23: static 00 00 engine-off; SLOW vs FAST turn test needed to distinguish rate from alt angle encoding
 22,760,22 20 1D,DSC status flag,A,,confirmed,2026-06-23: static 0x04 always - likely DSC armed indicator not dynamic measurement
 22,760,22 20 1F,DSC status flag,A,,confirmed,2026-06-23: static 0x00 always - likely no-fault indicator
 22,730,22 20 XX,EPS module range,n/a,n/a,dead,2026-06-23: full 256-PID range scan returned 0 hits. EPS does NOT respond to 0x730 header on ND3. Try 0x7E2 0x720 or physical addressing
 22,730,22 06 XX,EPS alt range,n/a,n/a,dead,2026-06-23: 0 hits in 256-PID scan
 22,760,22 21 XX,Yaw / lateral G range,n/a,n/a,dead,2026-06-23: 0 hits. Not on DSC at this range. Use IMU instead
 22,760,22 06 XX,Wheel speeds range,n/a,n/a,dead,2026-06-23: 0 hits. DSC has wheel speeds internally but does not expose at this sub-address
+06,7DF,06 21 82,Catalyst monitor B1 - oxygen storage capacity,((A*256)+B)*0.01,g,confirmed,2026-07-10: 0.60 measured vs 0.67 min threshold = FAIL (P0421). TRENDABLE cat health gauge - see docs/mode-06-monitoring.md. TID semantics inferred from behaviour not Mazda spec
+06,7DF,06 02 05,B1S2 rich-to-lean switch time,((A*256)+B)*0.001,s,confirmed,2026-07-10: 0.015 s (pass; range 0-1). Sensor response channel - goes SLOW when a narrowband sensor ages or is lead-poisoned
+06,7DF,06 02 06,B1S2 lean-to-rich switch time,((A*256)+B)*0.001,s,confirmed,2026-07-10: 0.19 s (pass; range 0-1)
+06,7DF,06 41 80,B1S1 O2 heater resistance,((A*256)+B)*0.001,kOhm,confirmed,2026-07-10: 0.155 kOhm (range 0.025-0.403). Watch this if you relocate O2 sensors with extension cables
+06,7DF,06 42 80,B1S2 O2 heater resistance,((A*256)+B)*0.001,kOhm,confirmed,2026-07-10: 0.100 kOhm (range 0.005-0.450)
+06,7DF,06 A2 0C,Cyl 1 misfire count this drive cycle,(A*256)+B,counts,confirmed,2026-07-10: 0. Per-cylinder per-session misfire - novel track telemetry channel
+06,7DF,06 A3 0C,Cyl 2 misfire count this drive cycle,(A*256)+B,counts,confirmed,2026-07-10: 0
+06,7DF,06 A4 0C,Cyl 3 misfire count this drive cycle,(A*256)+B,counts,confirmed,2026-07-10: 0
+06,7DF,06 A5 0C,Cyl 4 misfire count this drive cycle,(A*256)+B,counts,confirmed,2026-07-10: 0
+06,7DF,06 35 XX,VVT monitor bank 1 (6 TIDs),see docs/mode-06-monitoring.md,deg / s,confirmed,2026-07-10: TIDs 80-83 are angle errors (deg) and 84-85 are response times (s) with known bounds. Candidate decode oracle for the 22 09 XX Mode 22 cam/VVT cluster
